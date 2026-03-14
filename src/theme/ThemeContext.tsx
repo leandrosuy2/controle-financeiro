@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { useColorScheme } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { colors } from "./tokens";
+
+const THEME_STORAGE_KEY = "@financapro/theme";
 
 export type ThemeMode = "light" | "dark";
 
@@ -24,16 +27,27 @@ const ThemeContext = createContext<Theme | null>(null);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const systemScheme = useColorScheme();
-  const [mode, setMode] = useState<ThemeMode>(systemScheme === "dark" ? "dark" : "light");
+  const [mode, setMode] = useState<ThemeMode>(
+    () => (systemScheme === "dark" ? "dark" : "light")
+  );
 
+  // Carrega tema salvo ao iniciar; preferência do usuário sobrepõe o do sistema
   useEffect(() => {
-    if (systemScheme) {
-      setMode(systemScheme === "dark" ? "dark" : "light");
-    }
-  }, [systemScheme]);
+    AsyncStorage.getItem(THEME_STORAGE_KEY)
+      .then((saved) => {
+        if (saved === "dark" || saved === "light") {
+          setMode(saved);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const toggleTheme = useCallback(() => {
-    setMode((prev) => (prev === "dark" ? "light" : "dark"));
+    setMode((prev) => {
+      const next = prev === "dark" ? "light" : "dark";
+      AsyncStorage.setItem(THEME_STORAGE_KEY, next).catch(() => {});
+      return next;
+    });
   }, []);
 
   const isDark = mode === "dark";

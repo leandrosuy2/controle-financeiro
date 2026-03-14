@@ -14,6 +14,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { listarContas, FiltrosContas, FiltroPeriodo } from "../services/contas";
 import type { Conta } from "../types/conta";
+import Toast from "react-native-toast-message";
 import { CardConta } from "../components/CardConta";
 import { FormConta } from "../components/FormConta";
 import { useTheme } from "../theme/ThemeContext";
@@ -262,6 +263,8 @@ export function ListaContasScreen() {
               </ScrollView>
             </View>
           </KeyboardAvoidingView>
+          {/* Toast dentro do modal para mensagens aparecerem acima do conteúdo */}
+          <Toast />
         </View>
       </Modal>
     </ScrollView>

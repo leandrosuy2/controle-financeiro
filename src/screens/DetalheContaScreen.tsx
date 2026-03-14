@@ -255,6 +255,7 @@ export function DetalheContaScreen() {
               </TouchableOpacity>
             </View>
           </View>
+          <Toast />
         </View>
       </Modal>
 

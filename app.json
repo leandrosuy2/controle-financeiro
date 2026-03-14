@@ -27,12 +27,13 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "expo-sqlite",
       "expo-router",
       [
         "expo-splash-screen",
         {
           "image": "./assets/images/logo.png",
-          "imageWidth": 280,
+          "imageWidth": 240,
           "resizeMode": "contain",
           "backgroundColor": "#111827",
           "dark": {

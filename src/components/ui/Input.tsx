@@ -22,7 +22,7 @@ export function Input({ label, error, iconName, style, ...rest }: Props) {
   const wrapperStyle = [
     styles.inputWrapper,
     {
-      borderColor: theme.isDark ? colors.zinc700 : colors.slate200,
+      borderColor: error ? colors.danger : (theme.isDark ? colors.zinc700 : colors.slate200),
       backgroundColor: theme.isDark ? "rgba(0,0,0,0.6)" : colors.lightSurface,
     },
   ];

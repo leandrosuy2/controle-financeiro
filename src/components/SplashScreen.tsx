@@ -8,7 +8,7 @@ import {
 } from "react-native";
 
 const { width } = Dimensions.get("window");
-const LOGO_SIZE = Math.min(width * 0.7, 280);
+const LOGO_MAX_SIZE = Math.min(width * 0.7, 280);
 
 export function SplashScreen({ onFinish }: { onFinish: () => void }) {
   const opacity = useRef(new Animated.Value(1)).current;
@@ -38,7 +38,7 @@ export function SplashScreen({ onFinish }: { onFinish: () => void }) {
       <Animated.View style={[styles.logoWrap, { transform: [{ scale }] }]}>
         <Image
           source={require("../../assets/images/logo.png")}
-          style={styles.logo}
+          style={[styles.logo, { width: LOGO_MAX_SIZE, height: undefined }]}
           resizeMode="contain"
         />
       </Animated.View>
@@ -55,13 +55,12 @@ const styles = StyleSheet.create({
     zIndex: 9999,
   },
   logoWrap: {
-    width: LOGO_SIZE,
-    height: LOGO_SIZE,
     alignItems: "center",
     justifyContent: "center",
+    maxWidth: "100%",
   },
   logo: {
-    width: "100%",
-    height: "100%",
+    maxWidth: "100%",
+    maxHeight: LOGO_MAX_SIZE,
   },
 });

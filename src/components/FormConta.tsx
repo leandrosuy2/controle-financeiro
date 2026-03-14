@@ -53,6 +53,9 @@ export function FormConta({ contaInicial, onSalvo }: Props) {
     contaInicial?.hora_lembrete?.slice(0, 5) ?? "09:00"
   );
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [erroTitulo, setErroTitulo] = useState("");
+  const [erroValor, setErroValor] = useState("");
+  const [erroData, setErroData] = useState("");
 
   function dataParaDate(str: string): Date {
     if (!str || str.length < 10) return new Date();
@@ -81,16 +84,19 @@ export function FormConta({ contaInicial, onSalvo }: Props) {
   }
 
   function validar(): boolean {
+    setErroTitulo("");
+    setErroValor("");
+    setErroData("");
     if (!titulo.trim()) {
-      Toast.show({ type: "error", text1: "Campos obrigatórios", text2: "Informe o nome da conta." });
+      setErroTitulo("Informe o nome da conta.");
       return false;
     }
     if (!valor || isNaN(Number(valor))) {
-      Toast.show({ type: "error", text1: "Campos obrigatórios", text2: "Informe um valor numérico válido." });
+      setErroValor("Informe um valor numérico válido.");
       return false;
     }
     if (!dataVencimento) {
-      Toast.show({ type: "error", text1: "Campos obrigatórios", text2: "Escolha a data de vencimento." });
+      setErroData("Escolha a data de vencimento.");
       return false;
     }
     return true;
@@ -121,7 +127,13 @@ export function FormConta({ contaInicial, onSalvo }: Props) {
 
       onSalvo?.();
     } catch (e) {
-      Toast.show({ type: "error", text1: "Erro", text2: "Não foi possível salvar a conta." });
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[FormConta] Erro ao salvar conta:", e);
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: __DEV__ ? msg : "Não foi possível salvar a conta.",
+      });
     } finally {
       setSalvando(false);
     }
@@ -132,9 +144,10 @@ export function FormConta({ contaInicial, onSalvo }: Props) {
       <Input
         label="Nome da conta"
         value={titulo}
-        onChangeText={setTitulo}
+        onChangeText={(t) => { setTitulo(t); setErroTitulo(""); }}
         placeholder="Ex: Aluguel, Internet..."
         iconName="pricetag-outline"
+        error={erroTitulo}
       />
       <Input
         label="Descrição"
@@ -148,10 +161,11 @@ export function FormConta({ contaInicial, onSalvo }: Props) {
       <Input
         label="Valor (R$)"
         value={valor}
-        onChangeText={setValor}
+        onChangeText={(v) => { setValor(v); setErroValor(""); }}
         keyboardType="decimal-pad"
         placeholder="0,00"
         iconName="cash-outline"
+        error={erroValor}
       />
 
       <View style={styles.group}>
@@ -209,11 +223,11 @@ export function FormConta({ contaInicial, onSalvo }: Props) {
           Data de vencimento
         </Text>
         <TouchableOpacity
-          onPress={() => setShowDatePicker(true)}
+          onPress={() => { setShowDatePicker(true); setErroData(""); }}
           style={[
             styles.dateTouchable,
             {
-              borderColor: theme.isDark ? colors.zinc700 : colors.slate200,
+              borderColor: erroData ? colors.danger : (theme.isDark ? colors.zinc700 : colors.slate200),
               backgroundColor: theme.isDark ? "rgba(0,0,0,0.6)" : colors.lightSurface,
             },
           ]}
@@ -230,6 +244,7 @@ export function FormConta({ contaInicial, onSalvo }: Props) {
               : "Toque para escolher a data"}
           </Text>
         </TouchableOpacity>
+        {erroData ? <Text style={styles.dateError}>{erroData}</Text> : null}
       </View>
 
       <View style={styles.toggleRow}>
@@ -451,6 +466,11 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: typography.body.fontSize,
+  },
+  dateError: {
+    marginTop: 4,
+    fontSize: 12,
+    color: colors.danger,
   },
   datePickerBackdrop: {
     flex: 1,
