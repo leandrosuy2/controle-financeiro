@@ -4,7 +4,7 @@
     "slug": "financa-pro",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/splash-icon.png",
+    "icon": "./assets/images/icon-app-1024.png",
     "scheme": "financapro",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -13,10 +13,9 @@
       "buildNumber": "1"
     },
     "android": {
-      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#111827",
-        "foregroundImage": "./assets/images/splash-icon.png"
+        "foregroundImage": "./assets/images/icon-app-1024.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -32,8 +31,8 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/logo.png",
-          "imageWidth": 240,
+          "image": "./assets/images/logo-splash.png",
+          "imageWidth": 180,
           "resizeMode": "contain",
           "backgroundColor": "#111827",
           "dark": {

@@ -125,3 +125,11 @@ npx expo run:ios
 | Rodar no iOS local (Mac)    | `npm run ios`            |
 
 Depois do build no EAS, o link para baixar o app aparece no terminal e no dashboard: https://expo.dev
+
+---
+
+## Se o build Android falhar (Gradle)
+
+1. Rode `npx expo-doctor` e corrija versões de pacotes e configuração.
+2. Use dependências compatíveis com o Expo SDK do projeto (ex.: `npx expo install --fix`).
+3. **Ícone do app:** `icon` e `android.adaptiveIcon.foregroundImage` em `app.json` devem apontar para uma imagem **quadrada** (ex.: 1024×1024). Imagens não quadradas podem gerar aviso no `expo-doctor`; em alguns casos é preciso usar uma arte quadrada para o build passar.
