@@ -1,21 +1,19 @@
 import React from "react";
-import { View, Text, ScrollView, StyleSheet, Switch, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Switch } from "react-native";
 import Constants from "expo-constants";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../theme/ThemeContext";
 import { colors, radius } from "../theme/tokens";
-import { criarContasTeste } from "../services/contas";
 
 const appVersion = Constants.expoConfig?.version ?? Constants.manifest?.version ?? "1.0.0";
 const appName = Constants.expoConfig?.name ?? "Finança Pro";
 
 const NOVIDADES_VERSAO: string[] = [
-  "Tema claro/escuro com persistência ao fechar o app",
-  "Ícone e splash centralizados (sem corte)",
-  "Validação de campos direto nos inputs no modal Nova conta",
-  "Toasts aparecem acima dos modais",
-  "Botões Ver todas e Nova conta na Dashboard corrigidos",
-  "Build Android em APK (instalável direto)",
+  "Campo de valor com formatação em moeda (R$) no formulário de Nova conta",
+  "Tema claro/escuro persistente (mantém a escolha ao fechar o app)",
+  "Botões principais refinados (cores ajustadas para light/dark)",
+  "Lista de contas com filtros melhorados e botão dedicado para abrir/fechar filtros",
+  "Ajustes visuais em ícone, splash e notificações (texto e canal de lembretes)",
 ];
 
 export function ConfiguracoesScreen() {
@@ -33,52 +31,6 @@ export function ConfiguracoesScreen() {
         <Text style={[styles.headerSubtitle, { color: theme.textSecondary }]}>
           Ajustes do aplicativo
         </Text>
-      </View>
-
-      {__DEV__ && (
-        <View style={[styles.section, { backgroundColor: theme.surface, borderColor: theme.border }]}>
-          <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>
-            Desenvolvimento
-          </Text>
-          <TouchableOpacity
-            style={[styles.row, styles.rowDevButton]}
-            onPress={async () => {
-              await criarContasTeste(20);
-            }}
-          >
-            <View style={styles.rowLeft}>
-              <Ionicons name="beaker-outline" size={22} color={theme.primary} />
-              <Text style={[styles.rowLabel, { color: theme.text }]}>
-                Criar 20 contas de teste
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      <View style={[styles.section, { backgroundColor: theme.surface, borderColor: theme.border }]}>
-        <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>
-          O que há de novo
-        </Text>
-        <Text style={[styles.novidadesVersao, { color: theme.textSecondary }]}>
-          Versão {appVersion}
-        </Text>
-        {NOVIDADES_VERSAO.map((item, i) => (
-          <View
-            key={i}
-            style={[
-              styles.row,
-              styles.rowNovidade,
-              { borderBottomColor: theme.border },
-              i === NOVIDADES_VERSAO.length - 1 && styles.rowLast,
-            ]}
-          >
-            <Text style={[styles.bullet, { color: theme.primary }]}>•</Text>
-            <Text style={[styles.rowLabel, styles.rowNovidadeLabel, { color: theme.text }]}>
-              {item}
-            </Text>
-          </View>
-        ))}
       </View>
 
       <View style={[styles.section, { backgroundColor: theme.surface, borderColor: theme.border }]}>
@@ -124,6 +76,32 @@ export function ConfiguracoesScreen() {
             Contas a pagar e a receber, resumo mensal, lembretes no vencimento e tema claro/escuro.
           </Text>
         </View>
+      </View>
+
+      {/* Changelog */}
+      <View style={[styles.section, { backgroundColor: theme.surface, borderColor: theme.border }]}>
+        <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>
+          Changelog
+        </Text>
+        <Text style={[styles.novidadesVersao, { color: theme.textSecondary }]}>
+          Versão {appVersion}
+        </Text>
+        {NOVIDADES_VERSAO.map((item, i) => (
+          <View
+            key={i}
+            style={[
+              styles.row,
+              styles.rowNovidade,
+              { borderBottomColor: theme.border },
+              i === NOVIDADES_VERSAO.length - 1 && styles.rowLast,
+            ]}
+          >
+            <Text style={[styles.bullet, { color: theme.primary }]}>•</Text>
+            <Text style={[styles.rowLabel, styles.rowNovidadeLabel, { color: theme.text }]}>
+              {item}
+            </Text>
+          </View>
+        ))}
       </View>
     </ScrollView>
   );

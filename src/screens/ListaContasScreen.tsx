@@ -55,6 +55,7 @@ export function ListaContasScreen() {
     periodo: "mes",
     tipo: undefined,
   });
+  const [mostrarFiltros, setMostrarFiltros] = useState(true);
 
   const carregar = useCallback(async () => {
     try {
@@ -135,15 +136,38 @@ export function ListaContasScreen() {
             Minhas contas
           </Text>
         </View>
-        <TouchableOpacity
-          onPress={() => setMostrarModalNova(true)}
-          style={[styles.addButton, { backgroundColor: theme.primary }]}
-        >
-          <Ionicons name="add" size={18} color="#fff" />
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            onPress={() => setMostrarFiltros((prev) => !prev)}
+            style={[styles.iconButton, { borderColor: theme.border }]}
+          >
+            <Ionicons
+              name={mostrarFiltros ? "filter" : "filter-outline"}
+              size={18}
+              color={theme.textSecondary}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setMostrarModalNova(true)}
+            style={[styles.addButton, { backgroundColor: theme.primary }]}
+          >
+            <Ionicons name="add" size={18} color="#fff" />
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <View style={[styles.filtersCard, { backgroundColor: theme.surface, borderWidth: 1, borderColor: theme.border, borderRadius: radius.lg * 1.5 }]}>
+      <View
+        style={[
+          styles.filtersCard,
+          {
+            backgroundColor: theme.surface,
+            borderWidth: 1,
+            borderColor: theme.border,
+            borderRadius: radius.lg * 1.5,
+            display: mostrarFiltros ? "flex" : "none",
+          },
+        ]}
+      >
         {/* Abas internas: Todas / A pagar / A receber */}
         <View style={[styles.internalTabsRow, { backgroundColor: theme.isDark ? "rgba(255,255,255,0.08)" : "#f1f5f9" }]}>
           {[
@@ -215,8 +239,16 @@ export function ListaContasScreen() {
                     onPress={() => alterarStatus(opt.id)}
                     style={[
                       styles.smallChip,
-                      { backgroundColor: theme.isDark ? "rgba(255,255,255,0.08)" : "#f1f5f9" },
-                      ativo && { backgroundColor: theme.isDark ? "rgba(34,197,94,0.25)" : colors.primary },
+                      {
+                        backgroundColor: theme.isDark
+                          ? "rgba(255,255,255,0.08)"
+                          : "#f1f5f9",
+                      },
+                      ativo && {
+                        backgroundColor: theme.isDark
+                          ? "rgba(34,197,94,0.25)"
+                          : colors.primary,
+                      },
                     ]}
                   >
                     <Text
@@ -331,6 +363,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    columnGap: 8,
+  },
+  iconButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 999,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   headerSubtitle: {
     fontSize: 12,

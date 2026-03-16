@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Animated } from "react-native";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
@@ -54,9 +55,21 @@ function TabsLayout() {
             fontSize: 11,
             fontWeight: "600",
           },
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name={iconName} color={color} size={size} />
-          ),
+          tabBarIcon: ({ color, size, focused }) => {
+            const scale = focused ? 1.08 : 1.0;
+            const opacity = focused ? 1 : 0.9;
+            return (
+              <Animated.View
+                style={{
+                  transform: [{ scale }],
+                  opacity,
+                }}
+              >
+                <Ionicons name={iconName} color={color} size={size} />
+              </Animated.View>
+            );
+          },
+          animationEnabled: true,
         };
       }}
     >
