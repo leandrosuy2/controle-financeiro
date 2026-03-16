@@ -31,7 +31,8 @@ export async function configureNotifications() {
 
   if (Platform.OS === "android") {
     await Notifications.setNotificationChannelAsync(CANAL_LEMBRETES, {
-      name: "Lembretes de contas",
+      name: "Lembretes de vencimento",
+      description: "Avisos no dia do vencimento das contas",
       importance: Notifications.AndroidImportance.DEFAULT,
       sound: "default",
       vibrationPattern: [0, 250, 250, 250],
@@ -76,13 +77,13 @@ export async function agendarNotificacoesConta(
     const date = buildDateTrigger(dataVencimentoISO, horaLembrete);
     if (date.getTime() <= Date.now()) return;
 
-    const tipoTexto = tipo === "receber" ? "a receber" : "a pagar";
-    const body = `Conta ${tipoTexto} vence hoje: ${titulo}`;
+    const tipoLabel = tipo === "receber" ? "Conta a receber" : "Conta a pagar";
+    const body = `${titulo}\n${tipoLabel} • Vence hoje`;
 
     await Notifications.scheduleNotificationAsync({
       identifier: getIdConta(id),
       content: {
-        title: "Controle Financeiro",
+        title: "Finança Pro",
         body,
         sound: "default",
         data: { contaId: String(id) },

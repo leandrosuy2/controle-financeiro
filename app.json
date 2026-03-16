@@ -40,7 +40,13 @@
           }
         }
       ],
-      "expo-notifications",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon-app-1024.png",
+          "color": "#22C55E"
+        }
+      ],
       "@react-native-community/datetimepicker"
     ],
     "experiments": {
