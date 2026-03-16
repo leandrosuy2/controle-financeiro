@@ -8,6 +8,15 @@ import { colors, radius } from "../theme/tokens";
 const appVersion = Constants.expoConfig?.version ?? Constants.manifest?.version ?? "1.0.0";
 const appName = Constants.expoConfig?.name ?? "Finança Pro";
 
+const NOVIDADES_VERSAO: string[] = [
+  "Tema claro/escuro com persistência ao fechar o app",
+  "Ícone e splash centralizados (sem corte)",
+  "Validação de campos direto nos inputs no modal Nova conta",
+  "Toasts aparecem acima dos modais",
+  "Botões Ver todas e Nova conta na Dashboard corrigidos",
+  "Build Android em APK (instalável direto)",
+];
+
 export function ConfiguracoesScreen() {
   const theme = useTheme();
 
@@ -23,6 +32,31 @@ export function ConfiguracoesScreen() {
         <Text style={[styles.headerSubtitle, { color: theme.textSecondary }]}>
           Ajustes do aplicativo
         </Text>
+      </View>
+
+      <View style={[styles.section, { backgroundColor: theme.surface, borderColor: theme.border }]}>
+        <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>
+          O que há de novo
+        </Text>
+        <Text style={[styles.novidadesVersao, { color: theme.textSecondary }]}>
+          Versão {appVersion}
+        </Text>
+        {NOVIDADES_VERSAO.map((item, i) => (
+          <View
+            key={i}
+            style={[
+              styles.row,
+              styles.rowNovidade,
+              { borderBottomColor: theme.border },
+              i === NOVIDADES_VERSAO.length - 1 && styles.rowLast,
+            ]}
+          >
+            <Text style={[styles.bullet, { color: theme.primary }]}>•</Text>
+            <Text style={[styles.rowLabel, styles.rowNovidadeLabel, { color: theme.text }]}>
+              {item}
+            </Text>
+          </View>
+        ))}
       </View>
 
       <View style={[styles.section, { backgroundColor: theme.surface, borderColor: theme.border }]}>
@@ -134,5 +168,20 @@ const styles = StyleSheet.create({
   versionBadge: {
     fontSize: 15,
     fontWeight: "600",
+  },
+  novidadesVersao: {
+    fontSize: 13,
+    marginBottom: 10,
+  },
+  rowNovidade: {
+    alignItems: "flex-start",
+  },
+  rowNovidadeLabel: {
+    flex: 1,
+    fontWeight: "400",
+  },
+  bullet: {
+    marginRight: 8,
+    fontSize: 16,
   },
 });

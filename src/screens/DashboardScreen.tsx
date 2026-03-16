@@ -7,7 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import {
@@ -201,25 +201,29 @@ export function DashboardScreen() {
       )}
 
       <View style={styles.actionsRow}>
-        <Link href="/contas" asChild>
-          <View style={styles.actionButtonWrapper}>
-            <Button
-              title="Ver todas as contas"
-              iconName="list"
-              size="small"
-            />
-          </View>
-        </Link>
-        <Link href="/contas/nova" asChild>
-          <View style={styles.actionButtonWrapper}>
-            <Button
-              title="Nova conta"
-              iconName="add-circle"
-              variant="outline"
-              size="small"
-            />
-          </View>
-        </Link>
+        <TouchableOpacity
+          style={styles.actionButtonWrapper}
+          onPress={() => router.push("/contas")}
+          activeOpacity={0.8}
+        >
+          <Button
+            title="Ver todas as contas"
+            iconName="list"
+            size="small"
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.actionButtonWrapper}
+          onPress={() => router.push("/contas/nova")}
+          activeOpacity={0.8}
+        >
+          <Button
+            title="Nova conta"
+            iconName="add-circle"
+            variant="outline"
+            size="small"
+          />
+        </TouchableOpacity>
       </View>
 
       {/* Próximas a vencer */}
