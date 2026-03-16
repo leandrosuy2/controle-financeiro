@@ -1,9 +1,10 @@
 import React from "react";
-import { View, Text, ScrollView, StyleSheet, Switch } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Switch, TouchableOpacity } from "react-native";
 import Constants from "expo-constants";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../theme/ThemeContext";
 import { colors, radius } from "../theme/tokens";
+import { criarContasTeste } from "../services/contas";
 
 const appVersion = Constants.expoConfig?.version ?? Constants.manifest?.version ?? "1.0.0";
 const appName = Constants.expoConfig?.name ?? "Finança Pro";
@@ -33,6 +34,27 @@ export function ConfiguracoesScreen() {
           Ajustes do aplicativo
         </Text>
       </View>
+
+      {__DEV__ && (
+        <View style={[styles.section, { backgroundColor: theme.surface, borderColor: theme.border }]}>
+          <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>
+            Desenvolvimento
+          </Text>
+          <TouchableOpacity
+            style={[styles.row, styles.rowDevButton]}
+            onPress={async () => {
+              await criarContasTeste(20);
+            }}
+          >
+            <View style={styles.rowLeft}>
+              <Ionicons name="beaker-outline" size={22} color={theme.primary} />
+              <Text style={[styles.rowLabel, { color: theme.text }]}>
+                Criar 20 contas de teste
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      )}
 
       <View style={[styles.section, { backgroundColor: theme.surface, borderColor: theme.border }]}>
         <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>
@@ -183,5 +205,8 @@ const styles = StyleSheet.create({
   bullet: {
     marginRight: 8,
     fontSize: 16,
+  },
+  rowDevButton: {
+    borderBottomWidth: 0,
   },
 });

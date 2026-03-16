@@ -201,29 +201,25 @@ export function DashboardScreen() {
       )}
 
       <View style={styles.actionsRow}>
-        <TouchableOpacity
-          style={styles.actionButtonWrapper}
-          onPress={() => router.push("/contas")}
-          activeOpacity={0.8}
-        >
+        <View style={styles.actionButtonWrapper}>
           <Button
             title="Ver todas as contas"
             iconName="list"
             size="small"
+            textColorOverride="#FFFFFF"
+            iconColorOverride="#FFFFFF"
+            onPress={() => router.push("/contas")}
           />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.actionButtonWrapper}
-          onPress={() => router.push("/contas/nova")}
-          activeOpacity={0.8}
-        >
+        </View>
+        <View style={styles.actionButtonWrapper}>
           <Button
             title="Nova conta"
             iconName="add-circle"
             variant="outline"
             size="small"
+            onPress={() => router.push("/contas?abrirNova=1")}
           />
-        </TouchableOpacity>
+        </View>
       </View>
 
       {/* Próximas a vencer */}

@@ -172,12 +172,28 @@ function montarClausulasFiltro(filtros?: FiltrosContas) {
   return { whereSql, params };
 }
 
-export async function listarContas(filtros?: FiltrosContas): Promise<Conta[]> {
+export interface Paginacao {
+  limit?: number;
+  offset?: number;
+}
+
+export interface ListaContasResultado {
+  itens: Conta[];
+  hasMore: boolean;
+}
+
+export async function listarContas(
+  filtros?: FiltrosContas,
+  paginacao?: Paginacao
+): Promise<ListaContasResultado> {
   const db = await getDb();
   const { whereSql, params } = montarClausulasFiltro(filtros);
 
+  const limit = paginacao?.limit ?? 20;
+  const offset = paginacao?.offset ?? 0;
+
   const rows = await db.getAllAsync<Conta>(
-    `SELECT * FROM contas ${whereSql} ORDER BY date(data_vencimento) ASC`,
+    `SELECT * FROM contas ${whereSql} ORDER BY date(data_vencimento) ASC LIMIT ${limit + 1} OFFSET ${offset}`,
     params
   );
 
@@ -195,7 +211,10 @@ export async function listarContas(filtros?: FiltrosContas): Promise<Conta[]> {
     }
   }
 
-  return atualizadas;
+  const itens = atualizadas.slice(0, limit);
+  const hasMore = atualizadas.length > limit;
+
+  return { itens, hasMore };
 }
 
 export async function obterContaPorId(id: number): Promise<Conta | null> {
@@ -286,5 +305,40 @@ export async function obterProximasVencer(dias: number = 7): Promise<Conta[]> {
     ...c,
     status: calcularStatus(c.data_vencimento, c.status),
   }));
+}
+
+// Utilitário para criar contas de teste (apenas para desenvolvimento)
+export async function criarContasTeste(qtd: number = 20) {
+  const hoje = new Date();
+
+  const exemplos: Array<Partial<Conta>> = [
+    { titulo: "Aluguel", tipo: "pagar", categoria: "Moradia" },
+    { titulo: "Internet", tipo: "pagar", categoria: "Utilidades" },
+    { titulo: "Energia elétrica", tipo: "pagar", categoria: "Utilidades" },
+    { titulo: "Streaming", tipo: "pagar", categoria: "Lazer" },
+    { titulo: "Salário", tipo: "receber", categoria: "Renda" },
+    { titulo: "Freelancer", tipo: "receber", categoria: "Renda extra" },
+  ];
+
+  for (let i = 0; i < qtd; i++) {
+    const baseIdx = i % exemplos.length;
+    const exemplo = exemplos[baseIdx];
+
+    const diaOffset = (i % 15) - 5; // alguns atrasados, alguns futuros
+    const data = new Date(hoje);
+    data.setDate(hoje.getDate() + diaOffset);
+    const dataISO = data.toISOString().slice(0, 10);
+
+    await criarConta({
+      titulo: `${exemplo.titulo} ${i + 1}`,
+      descricao: "",
+      valor: ((baseIdx + 1) * 37.5 + i) / 1.0,
+      tipo: exemplo.tipo as ContaTipo,
+      categoria: exemplo.categoria ?? "",
+      data_vencimento: dataISO,
+      hora_lembrete: null,
+      recorrente: 0,
+    });
+  }
 }
 

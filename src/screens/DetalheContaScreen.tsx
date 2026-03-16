@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
 import type { Conta } from "../types/conta";
@@ -25,6 +26,7 @@ export function DetalheContaScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const theme = useTheme();
   const router = useRouter();
+  const navigation = useNavigation();
   const [conta, setConta] = useState<Conta | null>(null);
   const [editando, setEditando] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -45,6 +47,18 @@ export function DetalheContaScreen() {
   useEffect(() => {
     carregar();
   }, [id]);
+
+  useEffect(() => {
+    if (conta?.titulo) {
+      navigation.setOptions({
+        title: conta.titulo,
+      });
+    } else {
+      navigation.setOptions({
+        title: "Detalhe da conta",
+      });
+    }
+  }, [conta?.titulo, navigation]);
 
   function abrirModalExcluir() {
     setMostrarModalExcluir(true);

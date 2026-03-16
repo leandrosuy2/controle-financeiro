@@ -10,7 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { useFocusEffect, useRouter } from "expo-router";
+import { useFocusEffect, useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { listarContas, FiltrosContas, FiltroPeriodo } from "../services/contas";
 import type { Conta } from "../types/conta";
@@ -43,8 +43,13 @@ const tipoOptions = [
 export function ListaContasScreen() {
   const theme = useTheme();
   const router = useRouter();
+  const params = useLocalSearchParams<{ abrirNova?: string }>();
   const [contas, setContas] = useState<Conta[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const pageSize = 20;
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [mostrarModalNova, setMostrarModalNova] = useState(false);
   const [filtros, setFiltros] = useState<FiltrosContas>({
     periodo: "mes",
@@ -54,8 +59,13 @@ export function ListaContasScreen() {
   const carregar = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await listarContas(filtros);
-      setContas(data);
+      const { itens, hasMore } = await listarContas(filtros, {
+        limit: pageSize,
+        offset: 0,
+      });
+      setContas(itens);
+      setHasMore(hasMore);
+      setPage(0);
     } finally {
       setLoading(false);
     }
@@ -70,6 +80,31 @@ export function ListaContasScreen() {
   useEffect(() => {
     carregar();
   }, [carregar]);
+
+  async function carregarMais() {
+    if (loadingMore || !hasMore) return;
+    try {
+      setLoadingMore(true);
+      const nextPage = page + 1;
+      const { itens, hasMore: more } = await listarContas(filtros, {
+        limit: pageSize,
+        offset: nextPage * pageSize,
+      });
+      setContas((prev) => [...prev, ...itens]);
+      setHasMore(more);
+      setPage(nextPage);
+    } finally {
+      setLoadingMore(false);
+    }
+  }
+
+  // Abrir modal "Nova conta" quando vier da Dashboard com ?abrirNova=1
+  useEffect(() => {
+    if (params.abrirNova === "1") {
+      setMostrarModalNova(true);
+      router.replace("/contas");
+    }
+  }, [params.abrirNova]);
 
   function alterarPeriodo(periodo: FiltroPeriodo) {
     setFiltros((prev) => ({ ...prev, periodo }));
@@ -181,13 +216,13 @@ export function ListaContasScreen() {
                     style={[
                       styles.smallChip,
                       { backgroundColor: theme.isDark ? "rgba(255,255,255,0.08)" : "#f1f5f9" },
-                      ativo && { backgroundColor: theme.isDark ? "rgba(34,197,94,0.25)" : colors.primarySoft },
+                      ativo && { backgroundColor: theme.isDark ? "rgba(34,197,94,0.25)" : colors.primary },
                     ]}
                   >
                     <Text
                       style={[
                         styles.smallChipText,
-                        { color: ativo ? theme.primary : theme.textSecondary },
+                        { color: ativo ? "#FFFFFF" : theme.textSecondary },
                       ]}
                     >
                       {opt.label}
@@ -224,6 +259,17 @@ export function ListaContasScreen() {
               onPress={() => router.push(`/contas/${conta.id}`)}
             />
           ))}
+          {hasMore && (
+            <TouchableOpacity
+              style={[styles.loadMoreButton, { borderColor: theme.primary }]}
+              onPress={carregarMais}
+              disabled={loadingMore}
+            >
+              <Text style={[styles.loadMoreText, { color: theme.primary }]}>
+                {loadingMore ? "Carregando..." : "Carregar mais"}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       )}
 
@@ -405,6 +451,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     color: "#FFFFFF",
+  },
+  loadMoreButton: {
+    marginTop: 12,
+    marginBottom: 8,
+    alignSelf: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+  },
+  loadMoreText: {
+    fontSize: 14,
+    fontWeight: "600",
   },
   listContainer: {
     marginTop: 4,

@@ -21,6 +21,8 @@ interface Props extends PressableProps {
   size?: Size;
   loading?: boolean;
   iconName?: keyof typeof Ionicons.glyphMap;
+  textColorOverride?: string;
+  iconColorOverride?: string;
 }
 
 export function Button({
@@ -31,6 +33,8 @@ export function Button({
   iconName,
   disabled,
   style,
+  textColorOverride,
+  iconColorOverride,
   ...rest
 }: Props) {
   const theme = useTheme();
@@ -38,10 +42,15 @@ export function Button({
   const isSmall = size === "small";
   const textStyle = isSmall ? styles.textSmall : styles.text;
 
-  const primaryTextColor = theme.isDark ? "#111827" : "#FFFFFF";
-  const textColor =
+  // Em tema claro: texto escuro; em tema escuro: texto claro
+  const primaryTextColor = theme.isDark ? "#FFFFFF" : "#111827";
+  const computedTextColor =
     variant === "primary" ? primaryTextColor : theme.primary;
-  const iconColor = variant === "primary" ? primaryTextColor : theme.primary;
+  const computedIconColor =
+    variant === "primary" ? primaryTextColor : theme.primary;
+
+  const textColor = textColorOverride ?? computedTextColor;
+  const iconColor = iconColorOverride ?? computedIconColor;
 
   if (variant === "primary" && !isDisabled) {
     return (
@@ -74,7 +83,11 @@ export function Button({
 
   const containerStyle = [
     styles.base,
-    variant === "outline" && { borderWidth: 1, borderColor: theme.primary, backgroundColor: "transparent" },
+    variant === "outline" && {
+      borderWidth: 1,
+      borderColor: theme.primary,
+      backgroundColor: theme.isDark ? "transparent" : "#FFFFFF",
+    },
     variant === "ghost" && { backgroundColor: "transparent" },
     isDisabled && styles.disabled,
     style,

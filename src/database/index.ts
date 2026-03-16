@@ -1,6 +1,7 @@
 import * as SQLite from "expo-sqlite";
 
-const DB_NAME = "controle_financeiro.db";
+// Novo nome de arquivo para evitar problemas com bancos antigos incompatíveis
+const DB_NAME = "controle_financeiro_v2.db";
 
 let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 

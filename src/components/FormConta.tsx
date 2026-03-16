@@ -31,8 +31,19 @@ export function FormConta({ contaInicial, onSalvo }: Props) {
   const theme = useTheme();
   const [titulo, setTitulo] = useState(contaInicial?.titulo ?? "");
   const [descricao, setDescricao] = useState(contaInicial?.descricao ?? "");
-  const [valor, setValor] = useState(
-    contaInicial ? String(contaInicial.valor) : ""
+  // valor em duas formas:
+  // - valorDigits: apenas dígitos (centavos) para cálculo
+  // - valor: texto formatado em moeda BRL (ex: 1.234,56)
+  const [valorDigits, setValorDigits] = useState<string>(() =>
+    contaInicial ? Math.round(contaInicial.valor * 100).toString() : ""
+  );
+  const [valor, setValor] = useState<string>(() =>
+    contaInicial
+      ? contaInicial.valor.toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        }).replace("R$", "").trim()
+      : ""
   );
   const [tipo, setTipo] = useState<"pagar" | "receber">(
     contaInicial?.tipo ?? "pagar"
@@ -56,6 +67,19 @@ export function FormConta({ contaInicial, onSalvo }: Props) {
   const [erroTitulo, setErroTitulo] = useState("");
   const [erroValor, setErroValor] = useState("");
   const [erroData, setErroData] = useState("");
+
+  function formatValorFromDigits(digits: string): string {
+    if (!digits) return "";
+    const intVal = parseInt(digits, 10);
+    if (isNaN(intVal)) return "";
+    const cents = intVal % 100;
+    const reais = Math.floor(intVal / 100);
+    const reaisStr = reais.toLocaleString("pt-BR", {
+      maximumFractionDigits: 0,
+    });
+    const centsStr = cents.toString().padStart(2, "0");
+    return `${reaisStr},${centsStr}`;
+  }
 
   function dataParaDate(str: string): Date {
     if (!str || str.length < 10) return new Date();
@@ -91,7 +115,7 @@ export function FormConta({ contaInicial, onSalvo }: Props) {
       setErroTitulo("Informe o nome da conta.");
       return false;
     }
-    if (!valor || isNaN(Number(valor))) {
+    if (!valorDigits || isNaN(parseInt(valorDigits, 10))) {
       setErroValor("Informe um valor numérico válido.");
       return false;
     }
@@ -106,10 +130,14 @@ export function FormConta({ contaInicial, onSalvo }: Props) {
     if (!validar()) return;
     try {
       setSalvando(true);
+      const valorNumero =
+        valorDigits && !isNaN(parseInt(valorDigits, 10))
+          ? parseInt(valorDigits, 10) / 100
+          : 0;
       const base = {
         titulo: titulo.trim(),
         descricao: descricao.trim(),
-        valor: Number(valor),
+        valor: valorNumero,
         tipo,
         categoria: categoria.trim(),
         data_vencimento: dataVencimento,
@@ -161,7 +189,18 @@ export function FormConta({ contaInicial, onSalvo }: Props) {
       <Input
         label="Valor (R$)"
         value={valor}
-        onChangeText={(v) => { setValor(v); setErroValor(""); }}
+        onChangeText={(v) => {
+          // Mantém apenas dígitos e formata como moeda BRL enquanto digita
+          const cleaned = v.replace(/\D/g, "");
+          setErroValor("");
+          if (!cleaned) {
+            setValorDigits("");
+            setValor("");
+            return;
+          }
+          setValorDigits(cleaned);
+          setValor(formatValorFromDigits(cleaned));
+        }}
         keyboardType="decimal-pad"
         placeholder="0,00"
         iconName="cash-outline"
@@ -384,14 +423,17 @@ export function FormConta({ contaInicial, onSalvo }: Props) {
                 style={[
                   styles.repeatButton,
                   { borderColor: theme.border, backgroundColor: theme.surface },
-                  ativo && { borderColor: theme.primary, backgroundColor: theme.isDark ? "rgba(34,197,94,0.2)" : colors.primarySoft },
+                  ativo && {
+                    borderColor: theme.primary,
+                    backgroundColor: theme.isDark ? "rgba(34,197,94,0.25)" : colors.primary,
+                  },
                 ]}
               >
                 <Text
                   style={[
                     styles.repeatButtonText,
                     { color: theme.text },
-                    ativo && { color: theme.primary },
+                    ativo && { color: "#FFFFFF" },
                   ]}
                 >
                   {opt.label}
@@ -406,6 +448,9 @@ export function FormConta({ contaInicial, onSalvo }: Props) {
         title={contaInicial ? "Salvar alterações" : "Cadastrar conta"}
         onPress={handleSubmit}
         disabled={salvando}
+        variant={theme.isDark ? "primary" : "outline"}
+        textColorOverride={theme.isDark ? "#FFFFFF" : theme.primary}
+        iconColorOverride={theme.isDark ? "#FFFFFF" : theme.primary}
       />
     </View>
   );
